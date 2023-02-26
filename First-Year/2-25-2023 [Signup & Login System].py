@@ -129,7 +129,7 @@ class createAccount():
           print("\n\nCANCELLING ACCOUNT CREATION")
           self.username = None
           self.password = None
-          print("CANCELLED ACCOUNT CREATION")
+          print("CANCELED ACCOUNT CREATION")
           return False
         elif i.find("y") != -1:
           print("\n\nCREATING ACCOUNT")
