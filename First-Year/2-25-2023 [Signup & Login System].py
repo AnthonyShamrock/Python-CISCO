@@ -9,6 +9,8 @@ Write code that will use all the mathematical operators we have learned (+,-,*,/
 '''
 import threading
 import time
+import base64
+import hashlib
 securityRequirements = {"minLength": 8, "containSpecialCharacter": True, "Security": {"maxRetries": 3, "timeOut": 10}, "Login": {"checkIfUser": False, "enforceInputLength": False}}
 retries = {"system": 0 }
 
@@ -24,6 +26,7 @@ def removeWhitespace(text: str):
       continue
     a += b
   return a
+print(base64.b64decode(b'TWFkZSBieSBBbnRob255U2hhbXJvY2s==').decode())
 
 def isUsernameAvailable(username: str):
   f = open("userInformation.txt", "r")
@@ -41,6 +44,7 @@ def security():
     time.sleep(securityRequirements["Security"]["timeOut"])
     retries["system"] = 0
     return False
+
   def init():
     retries["system"] += 1
     time.sleep(securityRequirements["Security"]["timeOut"])
@@ -53,7 +57,7 @@ def doesUserPasswordMatch(username:str, password: str):
     b = removeWhitespace(str(b).replace("\n", "")).split(":")
     if b[0].lower() == username.lower():
       f.close()
-      return password == str(b[1])
+      return hashlib.sha256(str(password).encode()).hexdigest() == str(b[1])
   f.close()
   return False
 
@@ -129,12 +133,12 @@ class createAccount():
           print("\n\nCANCELLING ACCOUNT CREATION")
           self.username = None
           self.password = None
-          print("CANCELLED ACCOUNT CREATION")
+          print("CANCELED ACCOUNT CREATION")
           return False
         elif i.find("y") != -1:
           print("\n\nCREATING ACCOUNT")
           f = open("userInformation.txt", "a")
-          f.write("\n{}:{}".format(self.username, self.password))
+          f.write("\n{}:{}".format(self.username, hashlib.sha256(str(self.password).encode()).hexdigest()))
           f.close()
           print("ACCOUNT CREATED")
           return True
