@@ -7,8 +7,9 @@ Write code that demonstrates your understanding of the following:
 
 Write code that will use all the mathematical operators we have learned (+,-,*,/,**,//,%)  
 '''
-
-securityRequirements = {"minLength": 8, "containSpecialCharacter": True, "maxRetries": 3, "Login": {"checkIfUser": False, "enforceInputLength": False}}
+import threading
+import time
+securityRequirements = {"minLength": 8, "containSpecialCharacter": True, "Security": {"maxRetries": 3, "timeOut": 10}, "Login": {"checkIfUser": False, "enforceInputLength": False}}
 retries = {"system": 0 }
 
 try:
@@ -35,10 +36,16 @@ def isUsernameAvailable(username: str):
   return True
 
 def security():
-  retries["system"] += 1
-  if retries["system"] >= securityRequirements["maxRetries"]:
-      print("RATELIMITED TRY AGAIN LATER")
-      exit()
+  if retries["system"] >= securityRequirements["Security"]["maxRetries"]:
+    print("RATELIMITED TRY AGAIN LATER")
+    time.sleep(securityRequirements["Security"]["timeOut"])
+    retries["system"] = 0
+    return False
+  def init():
+    retries["system"] += 1
+    time.sleep(securityRequirements["Security"]["timeOut"])
+    retries["system"] -= 1
+  threading.Thread(target = init).start()
 
 def doesUserPasswordMatch(username:str, password: str):
   f = open("userInformation.txt", "r")
@@ -137,7 +144,11 @@ class createAccount():
       
 def run(forceLogin: bool):
   type = "l" if forceLogin  else input("login or signup?\n").lower()
+
+  if type.find("c") != -1:
+    exit()
   if type.find("s") != -1:
+    security()
     print("Create an account")
     u = createAccount()
     if not u.verifyAccount():
@@ -146,6 +157,8 @@ def run(forceLogin: bool):
     run(True)
     
   if type.find("l") != -1:
+    if not forceLogin:
+      security()
     u = accountManager()
     u.login()
   run(False)
